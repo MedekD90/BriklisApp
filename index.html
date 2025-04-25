@@ -42,8 +42,16 @@
       height: 150px;
     }
     main {
-      padding: 40px;
-      text-align: center;
+      padding: 20px;
+    }
+    .module { background: #fff; color: #0b1d3b; margin: 20px auto; padding: 20px; border-radius: 10px; max-width: 500px; }
+    .module h2 { color: #ffcc00; }
+    input, select, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
@@ -52,11 +60,40 @@
     <button class="share-btn" onclick="toggleQR()">📲 Sdílet appku</button>
   </header>
   <div class="qr-popup" id="qrPopup">
-    <img src="qr-code.png" alt="QR kód ke sdílení" />
+    <img src="https://medekd90.github.io/BriklisApp/qr-code.png" alt="QR kód ke sdílení" />
   </div>
   <main>
-    <h1>Briklis App</h1>
-    <p>Zde bude tvoje aplikace – kalkulačky, formuláře atd.</p>
+    <div class="module">
+      <h2>Kalkulačka briket</h2>
+      <select id="prumer">
+        <option value="40">Průměr 40 mm</option>
+        <option value="50">Průměr 50 mm</option>
+        <option value="60">Průměr 60 mm</option>
+        <option value="70">Průměr 70 mm</option>
+        <option value="80">Průměr 80 mm</option>
+        <option value="90">Průměr 90 mm</option>
+        <option value="100">Průměr 100 mm</option>
+        <option value="110">Průměr 110 mm</option>
+        <option value="120">Průměr 120 mm</option>
+        <option value="130">Průměr 130 mm</option>
+        <option value="140">Průměr 140 mm</option>
+      </select>
+      <input type="number" id="delka" placeholder="Délka brikety (mm)" />
+      <input type="number" id="hmotnost" placeholder="Hmotnost brikety (g)" />
+      <input type="number" id="cykly" placeholder="Počet cyklů/min (např. 2.5)" step="0.5" min="2" max="6" />
+      <button onclick="spocitat()">Spočítat</button>
+      <p id="vysledek"></p>
+    </div>
+
+    <div class="module">
+      <h2>Veletržní formulář</h2>
+      <input type="text" id="jmeno" placeholder="Jméno a příjmení" />
+      <input type="text" id="firma" placeholder="Firma" />
+      <input type="email" id="email" placeholder="Email" />
+      <input type="tel" id="telefon" placeholder="Telefon" />
+      <input type="text" id="veletrh" placeholder="Název veletrhu" />
+      <button onclick="odeslat()">Odeslat</button>
+    </div>
   </main>
   <script>
     function toggleQR() {
@@ -64,11 +101,66 @@
       popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
     }
 
+    function spocitat() {
+      const prumer = document.getElementById('prumer').value;
+      const delka = document.getElementById('delka').value;
+      const hmotnost = document.getElementById('hmotnost').value;
+      const cykly = document.getElementById('cykly').value;
+
+      if (!delka || !hmotnost || !cykly) {
+        document.getElementById('vysledek').innerText = "Vyplň všechny hodnoty!";
+        return;
+      }
+
+      const objem = Math.PI * (Math.pow(prumer/2,2)) * delka; // mm3
+      const hustota = (hmotnost / objem) * 1000; // g/cm3
+      const vykon = (hmotnost/1000) * cykly * 60; // kg/h
+
+      document.getElementById('vysledek').innerHTML = `
+        Měrná hmotnost: ${hustota.toFixed(2)} g/cm³<br/>
+        Teoretický výkon: ${vykon.toFixed(2)} kg/h
+      `;
+    }
+
+    function odeslat() {
+      const jmeno = document.getElementById('jmeno').value;
+      const firma = document.getElementById('firma').value;
+      const email = document.getElementById('email').value;
+      const telefon = document.getElementById('telefon').value;
+      const veletrh = document.getElementById('veletrh').value;
+
+      if (!jmeno || !firma || !email || !telefon || !veletrh) {
+        alert("Vyplň všechna pole!");
+        return;
+      }
+
+      const serviceID = "service_8xfwed4";
+      const templateID = "template_pqjjt0c";
+
+      emailjs.send(serviceID, templateID, {
+        company: firma,
+        email: email,
+        name: jmeno,
+        phone: telefon,
+        veletrh: veletrh
+      }).then(() => {
+        alert("Úspěšně odesláno!");
+      }, (err) => {
+        alert("Chyba: " + JSON.stringify(err));
+      });
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js');
       });
     }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("rdubF3SmlEKXHcDMx");
+    })();
   </script>
 </body>
 </html>
