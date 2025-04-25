@@ -9,12 +9,169 @@
   <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
   <meta name="theme-color" content="#ffcc00" />
   <style>
-    body { font-family: Arial; background: #0b1d3b; color: white; text-align: center; padding: 50px; }
-    h1 { color: #ffcc00; }
+    body { font-family: Arial; background: #0b1d3b; color: white; margin: 0; padding: 20px; }
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button.main-btn {
+      background-color: #ffcc00;
+      color: #0b1d3b;
+      border: none;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .module {
+      display: none;
+      background: #fff;
+      color: #0b1d3b;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .qr-popup {
+      display: none;
+      margin-top: 20px;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .qr-popup img {
+      width: 150px;
+      height: 150px;
+    }
   </style>
 </head>
 <body>
-  <h1>Briklis App je připravená!</h1>
-  <p>Otevři tuto stránku v Safari a přidej na plochu: Sdílet → Přidat na plochu</p>
+  <header>
+    <button class="main-btn" onclick="showModule('kalkulacka')">📏 Kalkulačka briket</button>
+    <button class="main-btn" onclick="showModule('formular')">📝 Veletržní formulář</button>
+    <button class="main-btn" onclick="toggleQR()">📲 Sdílet appku</button>
+  </header>
+
+  <div id="kalkulacka" class="module">
+    <h2>Kalkulačka briket</h2>
+    <select id="prumer">
+      <option value="40">Průměr 40 mm</option>
+      <option value="50">Průměr 50 mm</option>
+      <option value="60">Průměr 60 mm</option>
+      <option value="70">Průměr 70 mm</option>
+      <option value="80">Průměr 80 mm</option>
+      <option value="90">Průměr 90 mm</option>
+      <option value="100">Průměr 100 mm</option>
+      <option value="110">Průměr 110 mm</option>
+      <option value="120">Průměr 120 mm</option>
+      <option value="130">Průměr 130 mm</option>
+      <option value="140">Průměr 140 mm</option>
+    </select>
+    <input type="number" id="delka" placeholder="Délka brikety (mm)" />
+    <input type="number" id="hmotnost" placeholder="Hmotnost brikety (g)" />
+    <input type="number" id="cykly" placeholder="Počet cyklů/min (2-6)" step="0.5" min="2" max="6" />
+    <button onclick="spocitat()">Spočítat</button>
+    <p id="vysledek"></p>
+  </div>
+
+  <div id="formular" class="module">
+    <h2>Veletržní formulář</h2>
+    <input type="text" id="jmeno" placeholder="Jméno a příjmení" />
+    <input type="text" id="firma" placeholder="Firma" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="tel" id="telefon" placeholder="Telefon" />
+    <input type="text" id="veletrh" placeholder="Název veletrhu" />
+    <textarea id="poznamky" placeholder="Poznámky"></textarea>
+    <button onclick="odeslat()">Odeslat</button>
+  </div>
+
+  <div class="qr-popup" id="qrPopup">
+    <img src="qr-code.png" alt="QR kód" />
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("rdubF3SmlEKXHcDMx");
+    })();
+
+    function showModule(id) {
+      document.getElementById('kalkulacka').style.display = 'none';
+      document.getElementById('formular').style.display = 'none';
+      document.getElementById(id).style.display = 'block';
+      document.getElementById('qrPopup').style.display = 'none';
+    }
+
+    function toggleQR() {
+      const qr = document.getElementById('qrPopup');
+      qr.style.display = qr.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('kalkulacka').style.display = 'none';
+      document.getElementById('formular').style.display = 'none';
+    }
+
+    function spocitat() {
+      const prumer = document.getElementById('prumer').value;
+      const delka = document.getElementById('delka').value;
+      const hmotnost = document.getElementById('hmotnost').value;
+      const cykly = document.getElementById('cykly').value;
+
+      if (!delka || !hmotnost || !cykly) {
+        document.getElementById('vysledek').innerText = "Vyplň všechny hodnoty!";
+        return;
+      }
+
+      const objem = Math.PI * Math.pow(prumer/2,2) * delka;
+      const hustota = (hmotnost / objem) * 1000;
+      const vykon = (hmotnost/1000) * cykly * 60;
+
+      document.getElementById('vysledek').innerHTML = `
+        Měrná hmotnost: ${hustota.toFixed(2)} g/cm³<br/>
+        Teoretický výkon: ${vykon.toFixed(2)} kg/h
+      `;
+    }
+
+    function odeslat() {
+      const jmeno = document.getElementById('jmeno').value;
+      const firma = document.getElementById('firma').value;
+      const email = document.getElementById('email').value;
+      const telefon = document.getElementById('telefon').value;
+      const veletrh = document.getElementById('veletrh').value;
+      const poznamky = document.getElementById('poznamky').value;
+
+      if (!jmeno || !firma || !email || !telefon || !veletrh) {
+        alert("Vyplň všechna povinná pole!");
+        return;
+      }
+
+      emailjs.send("service_8xfwed4", "template_pqjjt0c", {
+        company: firma,
+        email: email,
+        name: jmeno,
+        phone: telefon,
+        veletrh: veletrh,
+        notes: poznamky
+      }).then(() => {
+        alert("Úspěšně odesláno!");
+      }, (err) => {
+        alert("Chyba: " + JSON.stringify(err));
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
