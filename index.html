@@ -9,96 +9,114 @@
   <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
   <meta name="theme-color" content="#ffcc00" />
   <style>
-    body { font-family: Arial; background: #0b1d3b; color: white; margin: 0; padding: 0; }
+    body { font-family: Arial; background: #0b1d3b; color: white; margin: 0; padding: 20px; }
     header {
-      background-color: #0b1d3b;
-      padding: 10px 20px;
       display: flex;
-      justify-content: flex-end;
-      align-items: center;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
     }
-    button.share-btn {
+    button.main-btn {
       background-color: #ffcc00;
       color: #0b1d3b;
       border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: bold;
     }
-    .qr-popup {
+    .module {
       display: none;
-      position: absolute;
-      top: 50px;
-      right: 20px;
-      background: white;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #00000044;
-      z-index: 100;
-    }
-    .qr-popup img {
-      width: 150px;
-      height: 150px;
-    }
-    main {
+      background: #fff;
+      color: #0b1d3b;
+      margin-top: 20px;
       padding: 20px;
+      border-radius: 10px;
     }
-    .module { background: #fff; color: #0b1d3b; margin: 20px auto; padding: 20px; border-radius: 10px; max-width: 500px; }
-    .module h2 { color: #ffcc00; }
-    input, select, button {
+    input, select, textarea, button {
       width: 100%;
       margin: 8px 0;
       padding: 8px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+    .qr-popup {
+      display: none;
+      margin-top: 20px;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .qr-popup img {
+      width: 150px;
+      height: 150px;
+    }
   </style>
 </head>
 <body>
   <header>
-    <button class="share-btn" onclick="toggleQR()">📲 Sdílet appku</button>
+    <button class="main-btn" onclick="showModule('kalkulacka')">📏 Kalkulačka briket</button>
+    <button class="main-btn" onclick="showModule('formular')">📝 Veletržní formulář</button>
+    <button class="main-btn" onclick="toggleQR()">📲 Sdílet appku</button>
   </header>
-  <div class="qr-popup" id="qrPopup">
-    <img src="https://medekd90.github.io/BriklisApp/qr-code.png" alt="QR kód ke sdílení" />
-  </div>
-  <main>
-    <div class="module">
-      <h2>Kalkulačka briket</h2>
-      <select id="prumer">
-        <option value="40">Průměr 40 mm</option>
-        <option value="50">Průměr 50 mm</option>
-        <option value="60">Průměr 60 mm</option>
-        <option value="70">Průměr 70 mm</option>
-        <option value="80">Průměr 80 mm</option>
-        <option value="90">Průměr 90 mm</option>
-        <option value="100">Průměr 100 mm</option>
-        <option value="110">Průměr 110 mm</option>
-        <option value="120">Průměr 120 mm</option>
-        <option value="130">Průměr 130 mm</option>
-        <option value="140">Průměr 140 mm</option>
-      </select>
-      <input type="number" id="delka" placeholder="Délka brikety (mm)" />
-      <input type="number" id="hmotnost" placeholder="Hmotnost brikety (g)" />
-      <input type="number" id="cykly" placeholder="Počet cyklů/min (např. 2.5)" step="0.5" min="2" max="6" />
-      <button onclick="spocitat()">Spočítat</button>
-      <p id="vysledek"></p>
-    </div>
 
-    <div class="module">
-      <h2>Veletržní formulář</h2>
-      <input type="text" id="jmeno" placeholder="Jméno a příjmení" />
-      <input type="text" id="firma" placeholder="Firma" />
-      <input type="email" id="email" placeholder="Email" />
-      <input type="tel" id="telefon" placeholder="Telefon" />
-      <input type="text" id="veletrh" placeholder="Název veletrhu" />
-      <button onclick="odeslat()">Odeslat</button>
-    </div>
-  </main>
+  <div id="kalkulacka" class="module">
+    <h2>Kalkulačka briket</h2>
+    <select id="prumer">
+      <option value="40">Průměr 40 mm</option>
+      <option value="50">Průměr 50 mm</option>
+      <option value="60">Průměr 60 mm</option>
+      <option value="70">Průměr 70 mm</option>
+      <option value="80">Průměr 80 mm</option>
+      <option value="90">Průměr 90 mm</option>
+      <option value="100">Průměr 100 mm</option>
+      <option value="110">Průměr 110 mm</option>
+      <option value="120">Průměr 120 mm</option>
+      <option value="130">Průměr 130 mm</option>
+      <option value="140">Průměr 140 mm</option>
+    </select>
+    <input type="number" id="delka" placeholder="Délka brikety (mm)" />
+    <input type="number" id="hmotnost" placeholder="Hmotnost brikety (g)" />
+    <input type="number" id="cykly" placeholder="Počet cyklů/min (2-6)" step="0.5" min="2" max="6" />
+    <button onclick="spocitat()">Spočítat</button>
+    <p id="vysledek"></p>
+  </div>
+
+  <div id="formular" class="module">
+    <h2>Veletržní formulář</h2>
+    <input type="text" id="jmeno" placeholder="Jméno a příjmení" />
+    <input type="text" id="firma" placeholder="Firma" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="tel" id="telefon" placeholder="Telefon" />
+    <input type="text" id="veletrh" placeholder="Název veletrhu" />
+    <textarea id="poznamky" placeholder="Poznámky"></textarea>
+    <button onclick="odeslat()">Odeslat</button>
+  </div>
+
+  <div class="qr-popup" id="qrPopup">
+    <img src="qr-code.png" alt="QR kód" />
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
   <script>
+    (function() {
+      emailjs.init("rdubF3SmlEKXHcDMx");
+    })();
+
+    function showModule(id) {
+      document.getElementById('kalkulacka').style.display = 'none';
+      document.getElementById('formular').style.display = 'none';
+      document.getElementById(id).style.display = 'block';
+      document.getElementById('qrPopup').style.display = 'none';
+    }
+
     function toggleQR() {
-      const popup = document.getElementById('qrPopup');
-      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+      const qr = document.getElementById('qrPopup');
+      qr.style.display = qr.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('kalkulacka').style.display = 'none';
+      document.getElementById('formular').style.display = 'none';
     }
 
     function spocitat() {
@@ -112,9 +130,9 @@
         return;
       }
 
-      const objem = Math.PI * (Math.pow(prumer/2,2)) * delka; // mm3
-      const hustota = (hmotnost / objem) * 1000; // g/cm3
-      const vykon = (hmotnost/1000) * cykly * 60; // kg/h
+      const objem = Math.PI * Math.pow(prumer/2,2) * delka;
+      const hustota = (hmotnost / objem) * 1000;
+      const vykon = (hmotnost/1000) * cykly * 60;
 
       document.getElementById('vysledek').innerHTML = `
         Měrná hmotnost: ${hustota.toFixed(2)} g/cm³<br/>
@@ -128,21 +146,20 @@
       const email = document.getElementById('email').value;
       const telefon = document.getElementById('telefon').value;
       const veletrh = document.getElementById('veletrh').value;
+      const poznamky = document.getElementById('poznamky').value;
 
       if (!jmeno || !firma || !email || !telefon || !veletrh) {
-        alert("Vyplň všechna pole!");
+        alert("Vyplň všechna povinná pole!");
         return;
       }
 
-      const serviceID = "service_8xfwed4";
-      const templateID = "template_pqjjt0c";
-
-      emailjs.send(serviceID, templateID, {
+      emailjs.send("service_8xfwed4", "template_pqjjt0c", {
         company: firma,
         email: email,
         name: jmeno,
         phone: telefon,
-        veletrh: veletrh
+        veletrh: veletrh,
+        notes: poznamky
       }).then(() => {
         alert("Úspěšně odesláno!");
       }, (err) => {
@@ -155,12 +172,6 @@
         navigator.serviceWorker.register('service-worker.js');
       });
     }
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
-  <script>
-    (function() {
-      emailjs.init("rdubF3SmlEKXHcDMx");
-    })();
   </script>
 </body>
 </html>
