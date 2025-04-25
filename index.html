@@ -9,16 +9,61 @@
   <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
   <meta name="theme-color" content="#ffcc00" />
   <style>
-    body { font-family: Arial; background: #0b1d3b; color: white; text-align: center; padding: 50px; margin: 0; }
-    h1 { color: #ffcc00; margin-top: 20vh; }
-    img.qr { margin-top: 40px; width: 180px; }
+    body { font-family: Arial; background: #0b1d3b; color: white; margin: 0; padding: 0; }
+    header {
+      background-color: #0b1d3b;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    button.share-btn {
+      background-color: #ffcc00;
+      color: #0b1d3b;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .qr-popup {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00000044;
+      z-index: 100;
+    }
+    .qr-popup img {
+      width: 150px;
+      height: 150px;
+    }
+    main {
+      padding: 40px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <h1>Briklis App je připravená!</h1>
-  <p>Naskenuj QR kód a přidej si appku na plochu.</p>
-  <img src="qr-code.png" alt="QR kód" class="qr" />
+  <header>
+    <button class="share-btn" onclick="toggleQR()">📲 Sdílet appku</button>
+  </header>
+  <div class="qr-popup" id="qrPopup">
+    <img src="qr-code.png" alt="QR kód ke sdílení" />
+  </div>
+  <main>
+    <h1>Briklis App</h1>
+    <p>Zde bude tvoje aplikace – kalkulačky, formuláře atd.</p>
+  </main>
   <script>
+    function toggleQR() {
+      const popup = document.getElementById('qrPopup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js');
