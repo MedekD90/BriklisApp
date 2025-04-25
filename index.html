@@ -9,12 +9,21 @@
   <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
   <meta name="theme-color" content="#ffcc00" />
   <style>
-    body { font-family: Arial; background: #0b1d3b; color: white; text-align: center; padding: 50px; }
-    h1 { color: #ffcc00; }
+    body { font-family: Arial; background: #0b1d3b; color: white; text-align: center; padding: 50px; margin: 0; }
+    h1 { color: #ffcc00; margin-top: 20vh; }
+    img.qr { margin-top: 40px; width: 180px; }
   </style>
 </head>
 <body>
   <h1>Briklis App je připravená!</h1>
-  <p>Otevři tuto stránku v Safari a přidej na plochu: Sdílet → Přidat na plochu</p>
+  <p>Naskenuj QR kód a přidej si appku na plochu.</p>
+  <img src="qr-code.png" alt="QR kód" class="qr" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
