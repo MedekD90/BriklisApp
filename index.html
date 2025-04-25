@@ -2,113 +2,171 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Briklis App</title>
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-    <style>
-        body { margin: 0; font-family: Arial, sans-serif; background-color: #0b1d3b; color: #ffffff; }
-        .nav { display: flex; justify-content: center; background-color: #ffcc00; }
-        .nav button { flex: 1; padding: 15px; border: none; background-color: #ffcc00; color: #0b1d3b; font-weight: bold; cursor: pointer; }
-        .nav button.active { background-color: #ffe066; }
-        .module { display: none; padding: 20px; }
-        .module.active { display: block; }
-        input, select, textarea { display: block; margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; font-size: 1rem; }
-        label { margin-top: 15px; display: block; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Briklis App</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+  <meta name="theme-color" content="#ffcc00" />
+  <style>
+    body { font-family: Arial; background: #0b1d3b; color: white; margin: 0; padding: 20px; }
+    header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    button.main-btn {
+      background-color: #ffcc00; color: #0b1d3b;
+      border: none; padding: 15px;
+      font-size: 18px; border-radius: 10px;
+      cursor: pointer; font-weight: bold;
+    }
+    .module {
+      display: none;
+      background: #fff; color: #0b1d3b;
+      margin-top: 20px; padding: 20px;
+      border-radius: 10px;
+    }
+    input, select, textarea, button {
+      width: 100%; margin: 8px 0;
+      padding: 8px; border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .qr-popup {
+      display: none;
+      margin-top: 20px; background: white;
+      padding: 10px; border-radius: 10px;
+      text-align: center;
+    }
+    .qr-popup img {
+      width: 150px; height: 150px;
+    }
+  </style>
 </head>
 <body>
-    <div class="nav">
-        <button id="btnCalc" class="active" onclick="showModule('calc')">📐 Kalkulačka</button>
-        <button id="btnForm" onclick="showModule('form')">📝 Veletržní list</button>
-    </div>
+  <header>
+    <button class="main-btn" onclick="showModule('kalkulacka')">📏 Kalkulačka briket</button>
+    <button class="main-btn" onclick="showModule('formular')">📝 Veletržní formulář</button>
+    <button class="main-btn" onclick="toggleQR()">📲 Sdílet appku</button>
+  </header>
 
-    <div id="calc" class="module active">
-        <h2>Kalkulačka parametrů briket</h2>
-        <label for="diameter">Průměr (mm)</label>
-        <select id="diameter">
-            <option value="40">40</option><option value="50">50</option><option value="60">60</option>
-            <option value="70">70</option><option value="80">80</option><option value="90">90</option>
-            <option value="100">100</option><option value="110">110</option><option value="120">120</option>
-            <option value="130">130</option><option value="140">140</option>
-        </select>
-        <label for="length">Délka brikety (mm)</label>
-        <input type="number" id="length">
-        <label for="weight">Hmotnost brikety (g)</label>
-        <input type="number" id="weight">
-        <label for="cycles">Počet cyklů za minutu</label>
-        <select id="cycles">
-            <option value="2">2</option><option value="2.5">2.5</option><option value="3">3</option>
-            <option value="3.5">3.5</option><option value="4">4</option><option value="4.5">4.5</option>
-            <option value="5">5</option><option value="5.5">5.5</option><option value="6">6</option>
-        </select>
-        <button onclick="calculateDensity()">Spočítat měrnou hmotnost</button>
-        <p id="resultDensity"></p>
-        <button onclick="calculatePerformance()">Spočítat výkon</button>
-        <p id="resultPerformance"></p>
-    </div>
+  <div id="kalkulacka" class="module">
+    <h2>Kalkulačka briket</h2>
+    <select id="prumer">
+      <option value="40">Průměr 40 mm</option>
+      <option value="50">Průměr 50 mm</option>
+      <option value="60">Průměr 60 mm</option>
+      <option value="70">Průměr 70 mm</option>
+      <option value="80">Průměr 80 mm</option>
+      <option value="90">Průměr 90 mm</option>
+      <option value="100">Průměr 100 mm</option>
+      <option value="110">Průměr 110 mm</option>
+      <option value="120">Průměr 120 mm</option>
+      <option value="130">Průměr 130 mm</option>
+      <option value="140">Průměr 140 mm</option>
+    </select>
+    <input type="number" id="delka" placeholder="Délka brikety (mm)" />
+    <input type="number" id="hmotnost" placeholder="Hmotnost brikety (g)" />
+    <input type="number" id="cykly" placeholder="Počet cyklů/min (2-6)" step="0.5" min="2" max="6" />
+    <button onclick="spocitat()">Spočítat</button>
+    <p id="vysledek"></p>
+  </div>
 
-    <div id="form" class="module">
-        <h2>Veletržní list</h2>
-        <form id="contact-form">
-            <label for="company">Firma</label><input type="text" name="company" id="company" required>
-            <label for="veletrh">Veletrh</label><input type="text" name="veletrh" id="veletrh" required>
-            <label for="contact">Kontaktní osoba</label><input type="text" name="contact" id="contact" required>
-            <label for="phone">Telefon</label><input type="tel" name="phone" id="phone" required>
-            <label for="email">E-mail</label><input type="email" name="email" id="email" required>
-            <label for="notes">Poznámky</label><textarea name="notes" id="notes" rows="4"></textarea>
-            <label for="user_email_to">E-mail příjemce</label><input type="email" name="user_email_to" id="user_email_to" required>
-            <button type="submit">📤 Odeslat formulář</button>
-        </form>
-        <p id="email-status"></p>
-    </div>
+  <div id="formular" class="module">
+    <h2>Veletržní formulář</h2>
+    <input type="text" id="jmeno" placeholder="Jméno a příjmení" />
+    <input type="text" id="firma" placeholder="Firma" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="tel" id="telefon" placeholder="Telefon" />
+    <input type="text" id="veletrh" placeholder="Název veletrhu" />
+    <textarea id="poznamky" placeholder="Poznámky"></textarea>
+    <button onclick="odeslat()">Odeslat</button>
+  </div>
 
-    <script>
-        emailjs.init("rdubF3SmlEKXHcDMx");
+  <div class="qr-popup" id="qrPopup">
+    <img src="qr-code.png" alt="QR kód" />
+  </div>
 
-        function showModule(module) {
-            document.getElementById('calc').classList.remove('active');
-            document.getElementById('form').classList.remove('active');
-            document.getElementById('btnCalc').classList.remove('active');
-            document.getElementById('btnForm').classList.remove('active');
-            document.getElementById(module).classList.add('active');
-            document.getElementById('btn' + module.charAt(0).toUpperCase() + module.slice(1)).classList.add('active');
-        }
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("rdubF3SmlEKXHcDMx");
+    })();
 
-        function calculateDensity() {
-            const diameter = parseFloat(document.getElementById('diameter').value);
-            const length = parseFloat(document.getElementById('length').value);
-            const weight = parseFloat(document.getElementById('weight').value);
-            if (isNaN(diameter) || isNaN(length) || isNaN(weight)) {
-                document.getElementById('resultDensity').textContent = 'Prosím vyplňte všechna pole.';
-                return;
-            }
-            const volume = Math.PI * Math.pow(diameter / 2 / 1000, 2) * (length / 1000);
-            const density = (weight / 1000) / volume;
-            document.getElementById('resultDensity').textContent = `Měrná hmotnost: ${density.toFixed(2)} kg/m³`;
-        }
+    function showModule(id) {
+      document.getElementById('kalkulacka').style.display = 'none';
+      document.getElementById('formular').style.display = 'none';
+      document.getElementById(id).style.display = 'block';
+      document.getElementById('qrPopup').style.display = 'none';
+    }
 
-        function calculatePerformance() {
-            const weight = parseFloat(document.getElementById('weight').value);
-            const cycles = parseFloat(document.getElementById('cycles').value);
-            if (isNaN(weight) || isNaN(cycles)) {
-                document.getElementById('resultPerformance').textContent = 'Zadejte hmotnost a cykly.';
-                return;
-            }
-            const totalPerHour = (weight / 1000) * cycles * 60;
-            document.getElementById('resultPerformance').textContent = `Teoretický výkon: ${totalPerHour.toFixed(2)} kg/h`;
-        }
+    function toggleQR() {
+      const qr = document.getElementById('qrPopup');
+      qr.style.display = qr.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('kalkulacka').style.display = 'none';
+      document.getElementById('formular').style.display = 'none';
+    }
 
-        document.getElementById('contact-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            emailjs.sendForm('service_8xfwed4', 'template_pqjjt0c', this)
-                .then(() => {
-                    document.getElementById('email-status').textContent = "Formulář byl úspěšně odeslán!";
-                    this.reset();
-                }, (error) => {
-                    document.getElementById('email-status').textContent = "Chyba při odesílání: " + error.text;
-                });
-        });
-    </script>
+    function spocitat() {
+      const prumer = document.getElementById('prumer').value;
+      const delka = document.getElementById('delka').value;
+      const hmotnost = document.getElementById('hmotnost').value;
+      const cykly = document.getElementById('cykly').value;
+
+      if (!delka || !hmotnost || !cykly) {
+        document.getElementById('vysledek').innerText = "Vyplň všechny hodnoty!";
+        return;
+      }
+
+      const objem = Math.PI * Math.pow(prumer/2,2) * delka;
+      const hustota = (hmotnost / objem) * 1000;
+      const vykon = (hmotnost/1000) * cykly * 60;
+
+      document.getElementById('vysledek').innerHTML = `
+        Měrná hmotnost: ${hustota.toFixed(2)} g/cm³<br/>
+        Teoretický výkon: ${vykon.toFixed(2)} kg/h
+      `;
+    }
+
+    function saveEmail() {
+      const email = document.getElementById('email').value;
+      localStorage.setItem('savedEmail', email);
+    }
+
+    function odeslat() {
+      saveEmail();
+      const jmeno = document.getElementById('jmeno').value;
+      const firma = document.getElementById('firma').value;
+      const email = document.getElementById('email').value;
+      const telefon = document.getElementById('telefon').value;
+      const veletrh = document.getElementById('veletrh').value;
+      const poznamky = document.getElementById('poznamky').value;
+
+      if (!jmeno || !firma || !email || !telefon || !veletrh) {
+        alert("Vyplň všechna povinná pole!");
+        return;
+      }
+
+      emailjs.send("service_8xfwed4", "template_pqjjt0c", {
+        company: firma,
+        email: email,
+        name: jmeno,
+        phone: telefon,
+        veletrh: veletrh,
+        notes: poznamky
+      }).then(() => {
+        alert("Úspěšně odesláno!");
+      }, (err) => {
+        alert("Chyba: " + JSON.stringify(err));
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+
+      const emailField = document.getElementById('email');
+      if (localStorage.getItem('savedEmail')) {
+        emailField.value = localStorage.getItem('savedEmail');
+      }
+    }
+  </script>
 </body>
 </html>
